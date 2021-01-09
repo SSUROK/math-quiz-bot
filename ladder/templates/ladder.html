@@ -38,19 +38,19 @@
         <div class="ladder-header-row">
             <div class="ladder-cell">rank</div>
             <div class="ladder-cell">user</div>
-            <div class="ladder-cell">success</div>
+            <div class="ladder-cell">score</div>
         </div>
     </div>
     {% for rank in ladder %}
     <div class="ladder-row">
         <div class="ladder-cell">
-            {{ rank.rank }}
+            {{ loop.index }}
         </div>
         <div class="ladder-cell">
-            {{ rank.user }}
+            {{ rank["user_firstname"] }}
         </div>
         <div class="ladder-cell">
-            {{ rank.success }}
+            {{ rank["user_score"] }}
         </div>
     </div>
     {% endfor %}
