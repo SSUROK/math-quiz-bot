@@ -10,6 +10,8 @@ class State:
 
     score = 100
 
+    operator = "*"
+
     user_score = 0
     # start message with inline keyboard
     message_with_inline_keyboard_id = None

@@ -3,3 +3,4 @@ class Task:
     task = ""
     # "35"
     answer = ""
+    # "*"
