@@ -249,50 +249,49 @@ def on_all(message):
     nums = re.findall(r'\d+', s)
     nums = [int(i) for i in nums]
 
-    print(state.tries)
-
     if not nums and state.task is not None:
         hard_msg = bot.send_message(message.chat.id, "Что, сложно? Может, дать тебе другую задачу? ",
                                     reply_markup=too_hard())
         remove_reply_markup(message.chat.id, state, hard_msg)
         return
-
-    if state.task is None:
-        # Generate new task, show to user.
-        task = gen_task(state.operator)
-        state.task = task
-        state.tries = 0
-        state.user_id = user_id
-        bot.send_message(message.chat.id, task.task)
-        # remove keyboard from earlier message
-        remove_reply_markup(message.chat.id, state, None)
-        save_user_state(state)
-    else:
-        # Check answer
-        if message.text == state.task.answer:
-            correct_msg = bot.send_message(message.chat.id, f"И правда, {state.task.task}={message.text}. Продолжим?",
-                                   reply_markup=end_of_game())
-            # remove keyboard from earlier message
-            state.task = None
+    for i in nums:
+        if state.task is None:
+            # Generate new task, show to user.
+            task = gen_task(state.operator)
+            state.task = task
             state.tries = 0
             state.user_id = user_id
-            state.user_score += state.score
-            state.score = 100
+            bot.send_message(message.chat.id, task.task)
+            # remove keyboard from earlier message
+            remove_reply_markup(message.chat.id, state, None)
             save_user_state(state)
         else:
-            if state.tries >= 3:
-                stoopid_msg = bot.send_message(message.chat.id,
-                                               "Я вижу, эта задача тебе не по зубам. Давай попробуем другую? ",
-                                               reply_markup=over_3_tries())
-                remove_reply_markup(message.chat.id, state, stoopid_msg)
-            else:
-                wrong_msg = bot.send_message(message.chat.id, "Неверный ответ, попробуй ещё раз.",
-                                             reply_markup=remind_task())
+            # Check answer
+            if int(i) == int(state.task.answer):
+                correct_msg = bot.send_message(message.chat.id, f"И правда, {state.task.task}={i}. Продолжим?",
+                                       reply_markup=end_of_game())
                 # remove keyboard from earlier message
-                remove_reply_markup(message.chat.id, state, wrong_msg)
-                state.tries += 1
-                state.score -= 10
+                remove_reply_markup(message.chat.id, state, correct_msg)
+                state.task = None
+                state.tries = 0
+                state.user_id = user_id
+                state.user_score += state.score
+                state.score = 100
                 save_user_state(state)
+            else:
+                if state.tries >= 3:
+                    stoopid_msg = bot.send_message(message.chat.id,
+                                                   "Я вижу, эта задача тебе не по зубам. Давай попробуем другую? ",
+                                                   reply_markup=over_3_tries())
+                    remove_reply_markup(message.chat.id, state, stoopid_msg)
+                else:
+                    wrong_msg = bot.send_message(message.chat.id, f"Нет, {i}-это неправильный ответ.",
+                                                 reply_markup=remind_task())
+                    # remove keyboard from earlier message
+                    remove_reply_markup(message.chat.id, state, wrong_msg)
+                    state.tries += 1
+                    state.score -= 10
+                    save_user_state(state)
 
 
 # Handle inline keyboard button clicks
